@@ -3,15 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAppDispatch } from "@/app/store";
 import { setCredentials } from "@/modules/auth/store/authSlice";
-import { setAccessToken, setRefreshToken } from "@/shared/utils/cookies";
+import { setAccessToken } from "@/shared/utils/cookies";
 import { loginSchema, type LoginFormData } from "../schema/authSchema";
 import { useLoginMutation } from "../api/authApi";
-import Gradient from "@/assets/Gradation-background.jpg";
+import Gradient from "@/assets/Gradient.png";
+import Logo from "@/assets/Raabytlogo.png";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -22,10 +20,10 @@ const LoginPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "admin@eye.com", password: "password" },
+    mode: "onChange", 
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -33,112 +31,151 @@ const LoginPage = () => {
     try {
       const result = await login(data).unwrap();
       setAccessToken(result.accessToken);
-      setRefreshToken(result.refreshToken);
       dispatch(
         setCredentials({ user: result.user, accessToken: result.accessToken })
       );
-      navigate("/products");
+      if (result.user.role === "admin") {
+        navigate("/products");
+      } else {
+        navigate("/");
+      }
     } catch {
       setError("Invalid email or password");
     }
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left - Art (65% width) */}
-      <div className="hidden lg:flex lg:w-[65%] items-center justify-center p-3 bg-white">
-        <div className="w-full overflow-hidden rounded-3xl relative">
+    <div className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+
+      {/* Background Image */}
+      <img
+        src={Gradient}
+        alt="Background"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      {/* Dark Overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/30" />
+
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-7xl flex items-center justify-between px-20">
+
+        {/* LEFT SECTION */}
+        <div className="text-white max-w-xl space-y-6 flex flex-col items-center text-center">
+
+          {/* LOGO */}
           <img
-            src={Gradient}
-            alt="Abstract geometric art"
-            className="w-full h-full object-cover"
+            src={Logo}
+            alt="Logo"
+            className="w-40 object-contain mb-0"
           />
-          <div className="absolute top-4 left-4 p-7">
-            <p className="text-5xl font-bold text-gray-800 mt-1">Eye</p>
-          </div>
-          <div className="absolute bottom-4 left-4 p-7">
-            <p className="text-sm font-light text-gray-600">you can easily</p>
-            <p className="text-2xl font-bold text-gray-800 mt-1">
-              Get access to your personal hub clarity and productivity
-            </p>
-          </div>
+
+          <h1 className="text-5xl font-semibold tracking-tight">
+            Screen Display System
+          </h1>
+
+          <p className="text-lg text-gray-200 leading-relaxed">
+            A platform for creating, managing, and publishing content
+            from a centralized interface.
+          </p>
+
         </div>
-      </div>
 
-      {/* Right - Login (35% width) */}
-      <div className="w-[35%] flex items-center justify-center bg-white p-8">
-        <div className="w-full max-w-sm space-y-8">
-          {/* Branding */}
-          <div className="space-y-2">
-            <div className="flex items-start flex-col gap-3 justify-start">
-              <div className="w-full rounded-xl bg-white font-bold flex text-4xl items-center  justify-center">
-                Login
-              </div>
-            </div>
-            <h1 className="text-3xl mt-4 font-bold tracking-tight text-black">
-              Eye
-            </h1>
+        {/* RIGHT LOGIN CARD */}
+        <div className="w-[430px] bg-[#F1F1F1] rounded-2xl 
+        shadow-[0_40px_100px_rgba(0,0,0,0.6)] p-10">
 
-            <p className="text-sm text-black/60">
-              Access your tasks, notes, projects, and more any time anywhere -
-              and everything following one place.
-            </p>
-          </div>
+          <h2 className="text-2xl font-bold mb-1">
+            Welcome back
+          </h2>
+
+          <p className="text-gray-600 text-sm mb-6">
+            Enter your details to continue.
+          </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-black/80">
+
+            {/* EMAIL */}
+            <div>
+              <label className="text-sm font-medium text-gray-700">
                 Email
-              </Label>
-              <Input
-                id="email"
+              </label>
+              <input
                 type="email"
                 {...register("email")}
-                placeholder="admin@eye.com"
+                placeholder="Input your email"
+                className="mt-1 w-full p-3 rounded-lg border border-gray-300 
+              bg-white shadow-sm
+              focus:outline-none focus:ring-2 focus:ring-purple-600"
               />
               {errors.email && (
-                <p className="text-xs text-red-400">{errors.email.message}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-black/80">
+            {/* PASSWORD */}
+            <div>
+              <label className="text-sm font-medium text-gray-700">
                 Password
-              </Label>
-              <Input
-                id="password"
+              </label>
+              <input
                 type="password"
                 {...register("password")}
-                placeholder="••••••••"
+                placeholder="Enter password"
+                className="mt-1 w-full p-3 rounded-lg border border-gray-300 
+              bg-white shadow-sm
+              focus:outline-none focus:ring-2 focus:ring-purple-600"
               />
               {errors.password && (
-                <p className="text-xs text-red-400">
+                <p className="text-xs text-red-500 mt-1">
                   {errors.password.message}
                 </p>
               )}
             </div>
 
+            {/* REMEMBER + FORGOT */}
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2 text-gray-700">
+                <input type="checkbox" className="accent-purple-600" />
+                Remember Me
+              </label>
+
+              <button
+                type="button"
+                onClick={() => navigate("/auth/forgot-password")}
+                className="text-blue-600 hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
+
+            {/* ERROR */}
             {error && (
-              <p className="text-xs text-red-400 bg-red-400/10 rounded-md p-2">
+              <p className="text-xs text-red-500 bg-red-100 p-2 rounded">
                 {error}
               </p>
             )}
 
-            <Button
+            {/* BUTTON */}
+            <button
               type="submit"
-              disabled={isLoading}
-              className="w-full  text-white hover:bg-gray-900/90 font-semibold"
+              disabled={!isValid || isLoading}
+              className={`w-full py-3 rounded-lg font-medium flex justify-center items-center transition-all duration-300
+    ${isValid
+                  ? "bg-gradient-to-r from-purple-600 to-purple-800 text-white hover:opacity-90"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }
+  `}
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                "Sign In"
+                "Login"
               )}
-            </Button>
+            </button>
 
-            <p className="text-xs text-black/40 text-center">
-              Demo: admin@eye.com / password
-            </p>
           </form>
         </div>
       </div>
