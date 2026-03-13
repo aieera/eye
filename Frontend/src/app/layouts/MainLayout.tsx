@@ -1,16 +1,29 @@
-import AppSidebar from "@/app/sidebar/AppSidebar";
+import { Outlet } from "react-router-dom";
+import AppSidebar from "../sidebar/AppSidebar";
+import AppTopBar from "../sidebar/AppTopbar";
+import { Toaster } from "@/components/ui/toaster";
 
-interface MainLayoutProps {
-  children: React.ReactNode;
+export default function MainLayout() {
+  return (
+    <div className="h-screen flex flex-col">
+
+      {/* Topbar */}
+      <AppTopBar />
+
+      {/* Sidebar + Content */}
+      <div className="flex flex-1 overflow-hidden">
+
+        <AppSidebar />
+
+        <main className="flex-1 overflow-y-auto p-6 bg-[#F9F9FB]">
+          <Outlet />
+        </main>
+
+      </div>
+
+      {/* Global Toast */}
+      <Toaster />
+
+    </div>
+  );
 }
-
-const MainLayout = ({ children }: MainLayoutProps) => (
-  <div className="min-h-screen flex w-full">
-    <AppSidebar />
-    <main className="flex-1 overflow-auto bg-background">
-      {children}
-    </main>
-  </div>
-);
-
-export default MainLayout;

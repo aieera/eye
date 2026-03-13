@@ -1,117 +1,83 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Eye, ChevronDown, Package, LogOut, LayoutDashboard, ShoppingCart, Truck, Settings } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { sidebarMenu } from "./sidebarConfig";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useAppDispatch, useAppSelector } from "@/app/store";
-import { logout } from "@/modules/auth/store/authSlice";
-import { clearTokens } from "@/shared/utils/cookies";
-import { getSidebarItems } from "./sidebarConfig";
-import type { SidebarItem } from "@/shared/types/sidebar";
 
-const iconMap: Record<string, React.ReactNode> = {
-  Dashboard: <LayoutDashboard className="h-4 w-4" />,
-  Sales: <ShoppingCart className="h-4 w-4" />,
-  Purchase: <Truck className="h-4 w-4" />,
-  Settings: <Settings className="h-4 w-4" />,
-};
-
-const AppSidebar = () => {
-  const location = useLocation();
+export default function AppSidebar() {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const user = useAppSelector((s) => s.auth.user);
-  const items = getSidebarItems();
-
-  const handleLogout = () => {
-    clearTokens();
-    dispatch(logout());
-    navigate("/auth/login");
-  };
+  const location = useLocation();
 
   return (
-    <div className="w-60 min-h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col">
-      {/* Logo */}
-      <div className="p-4 flex items-center gap-3 border-b border-sidebar-border">
-       
-        <span className="font-bold text-lg text-sidebar-foreground">Eye</span>
-      </div>
+    <aside className="w-64 h-[calc(100vh-80px)] bg-[#F5F5F6] border-r flex flex-col">
 
-      {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-1">
-        {items.map((item) => (
-          <SidebarGroup key={item.title} item={item} currentPath={location.pathname} navigate={navigate} />
-        ))}
-      </nav>
+      {/* Menu Groups */}
+      <div className="px-4 pt-3 space-y-6">
 
-      {/* User footer */}
-      <div className="p-3 border-t border-sidebar-border space-y-2">
-        {user && (
-          <div className="px-3 py-2">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">{user.name}</p>
-            <p className="text-xs text-sidebar-foreground/50 truncate">{user.email}</p>
+        {sidebarMenu.map((group) => (
+          <div key={group.label}>
+            <p className="px-2 text-xs font-bold text-black mb-3">
+              {group.label}
+            </p>
+
+            <div className="space-y-2">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const active = location.pathname === item.path;
+
+                return (
+                  <Button
+                    key={item.name}
+                    onClick={() => navigate(item.path)}
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start gap-3 rounded-full px-4 py-2 text-sm",
+                      active
+                        ? "bg-purple-900 text-white hover:bg-purple-900"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-7 h-7 flex items-center justify-center rounded-full",
+                        active ? "bg-white/20" : "bg-white"
+                      )}
+                    >
+                      <Icon size={16} />
+                    </div>
+
+                    {item.name}
+                  </Button>
+                );
+              })}
+            </div>
           </div>
-        )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-4 w-4 mr-2" /> Sign Out
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-const SidebarGroup = ({ item, currentPath, navigate }: { item: SidebarItem; currentPath: string; navigate: any }) => {
-  const hasChildren = item.children && item.children.length > 0;
-  const isActive = item.path === currentPath;
-  const isChildActive = item.children?.some((c) => currentPath.startsWith(c.path || ""));
-
-  if (!hasChildren && item.path) {
-    return (
-      <button
-        onClick={() => navigate(item.path)}
-        className={cn(
-          "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-          isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"
-        )}
-      >
-        {iconMap[item.title]}
-        <span>{item.title}</span>
-      </button>
-    );
-  }
-
-  return (
-    <Collapsible defaultOpen={isChildActive}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/50 transition-colors">
-        <div className="flex items-center gap-2">
-          {iconMap[item.title]}
-          <span>{item.title}</span>
-        </div>
-        <ChevronDown className="h-3.5 w-3.5 transition-transform [[data-state=open]>&]:rotate-180" />
-      </CollapsibleTrigger>
-      <CollapsibleContent className="ml-4 space-y-0.5 mt-0.5">
-        {item.children?.map((child) => (
-          <button
-            key={child.path}
-            onClick={() => navigate(child.path)}
-            className={cn(
-              "w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
-              currentPath === child.path
-                ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                : "text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-            )}
-          >
-            <span>{child.title}</span>
-          </button>
         ))}
-      </CollapsibleContent>
-    </Collapsible>
-  );
-};
+      </div>
 
-export default AppSidebar;
+      {/* Help Card */}
+      <div className="mt-5 p-3">
+        <div className="bg-white rounded-xl shadow-sm border p-5 text-center">
+
+          <div className="w-8 h-8 mx-auto flex items-center justify-center rounded-full bg-black text-white mb-2">
+            <HelpCircle size={16} />
+          </div>
+
+          <p className="text-sm font-semibold text-black">
+            Help & Support
+          </p>
+
+          <p className="text-xs text-gray-500 mb-3">
+            Having trouble in CMS?
+          </p>
+
+          <Button className="w-full rounded-full bg-purple-900 hover:bg-purple-800 text-white">
+            Contact us
+          </Button>
+
+        </div>
+      </div>
+
+    </aside>
+  );
+}
