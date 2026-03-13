@@ -10,12 +10,13 @@ import { loginSchema, type LoginFormData } from "../schema/authSchema";
 import { useLoginMutation } from "../api/authApi";
 import Gradient from "@/assets/Gradient.png";
 import Logo from "@/assets/Raabytlogo.png";
+import { toast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -23,24 +24,39 @@ const LoginPage = () => {
     formState: { errors, isValid },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: "onChange", 
+    mode: "onChange",
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setError("");
     try {
       const result = await login(data).unwrap();
+
       setAccessToken(result.accessToken);
+
       dispatch(
-        setCredentials({ user: result.user, accessToken: result.accessToken })
+        setCredentials({
+          user: result.user,
+          accessToken: result.accessToken,
+        })
       );
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+      });
+
       if (result.user.role === "admin") {
-        navigate("/products");
+        navigate("/screens");
       } else {
         navigate("/");
       }
-    } catch {
-      setError("Invalid email or password");
+
+    } catch (err: any) {
+      toast({
+        title: "Login Failed",
+        description: err?.data?.message || "Invalid email or password",
+        variant: "destructive",
+      });
     }
   };
 
@@ -120,14 +136,28 @@ const LoginPage = () => {
               <label className="text-sm font-medium text-gray-700">
                 Password
               </label>
-              <input
-                type="password"
-                {...register("password")}
-                placeholder="Enter password"
-                className="mt-1 w-full p-3 rounded-lg border border-gray-300 
-              bg-white shadow-sm
-              focus:outline-none focus:ring-2 focus:ring-purple-600"
-              />
+
+              <div className="relative mt-1">
+
+                <input
+                  type={showPassword ? "text" : "password"}
+                  {...register("password")}
+                  placeholder="Enter password"
+                  className="w-full p-3 rounded-lg border border-gray-300 
+      bg-white shadow-sm
+      focus:outline-none focus:ring-2 focus:ring-purple-600"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-500"
+                >
+                  <Eye size={18} />
+                </button>
+
+              </div>
+
               {errors.password && (
                 <p className="text-xs text-red-500 mt-1">
                   {errors.password.message}
@@ -150,13 +180,6 @@ const LoginPage = () => {
                 Forgot Password?
               </button>
             </div>
-
-            {/* ERROR */}
-            {error && (
-              <p className="text-xs text-red-500 bg-red-100 p-2 rounded">
-                {error}
-              </p>
-            )}
 
             {/* BUTTON */}
             <button
