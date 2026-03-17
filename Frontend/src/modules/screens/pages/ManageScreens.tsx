@@ -429,6 +429,7 @@ export default function ManageScreens() {
 
                                             {/* Schedule */}
                                             <div>
+                                                 <p className="text-sm font-medium mb-2">Schedule Playlist</p>
 
                                                 <label className="flex items-center gap-2 text-sm">
                                                     <input
