@@ -1,46 +1,50 @@
-import React from "react";
+import { useState } from "react";
 import { useGetProductsQuery } from "../api/productApi";
+import ProductToolbar from "../components/ProductToolbar";
+import ProductTable from "../components/ProductTable";
+import Pagination from "../../../shared/components/Pagination";
 
-function Products() {
+export default function Products() {
 
-  const { data: products = [], isLoading, error } = useGetProductsQuery();
+  const { data: products = [], isLoading } = useGetProductsQuery();
 
-  if (isLoading) return <div>Loading products...</div>;
-  if (error) return <div>Error loading products</div>;
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+
+  const itemsPerPage = 6;
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const start = (page - 1) * itemsPerPage;
+
+  const paginatedProducts = filteredProducts.slice(start, start + itemsPerPage);
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h2>Products</h2>
+    <div className="p-6 space-y-6">
 
-      {products.map((product: any) => (
-        <div
-          key={product.id}
-          style={{
-            border: "1px solid #ddd",
-            padding: "10px",
-            marginBottom: "10px",
-            borderRadius: "6px"
-          }}
-        >
-          <h3>{product.name}</h3>
-          <p>{product.description}</p>
-          <p>Category: {product.category}</p>
+      <div>
+        <h1 className="text-3xl font-semibold">Products</h1>
+        <p className="text-gray-500">Products</p>
+      </div>
 
-          {product.variants?.map((variant: any) => (
-            <div key={variant.id}>
-              <p>Price: ₹{variant.price}</p>
-              <img
-                src={variant.variant_media?.[0]?.media_url}
-                alt={product.name}
-                width="120"
-              />
-            </div>
-          ))}
-        </div>
-      ))}
+      <ProductToolbar
+        search={search}
+        setSearch={setSearch}
+      />
+
+      <ProductTable products={paginatedProducts} />
+
+      <Pagination
+        page={page}
+        setPage={setPage}
+        totalPages={totalPages}
+      />
 
     </div>
   );
 }
-
-export default Products;
