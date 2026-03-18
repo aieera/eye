@@ -8,11 +8,15 @@ import type { ModuleRoute } from "@/shared/types/route";
 import MainLayout from "@/app/layouts/MainLayout";
 import { playlistRoutes } from "@/modules/playlists/routes/playlistRoutes";
 import { productRoutes } from "@/modules/products/routes/productRoutes";
+import { offerRoutes } from "@/modules/offers/routes/offerRoutes";
+import { brandRoutes } from "@/modules/brands/routes/brandRoutes";
 
 const protectedRoutes: ModuleRoute[] = [
   ...screenRoutes,
   ...playlistRoutes,
-  ...productRoutes
+  ...productRoutes,
+  ...offerRoutes,
+  ...brandRoutes
   
 ];
 
