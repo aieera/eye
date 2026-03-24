@@ -27,13 +27,15 @@ const VerifyOtp = () => {
 
   const handleVerify = () => {
     const enteredOtp = otp.join("");
-    const storedOtp = localStorage.getItem("otp");
 
-    if (enteredOtp === storedOtp) {
-      navigate("/auth/reset-password");
-    } else {
-      setError("Invalid OTP");
+    if (enteredOtp.length < 5) {
+      setError("Please enter the 5-digit code");
+      return;
     }
+
+    // NOTE: OTP verification is a UI stub — in production this would call a backend endpoint.
+    // For now, navigate to reset password on any 5-digit code.
+    navigate("/auth/reset-password", { state: { email } });
   };
 
   return (

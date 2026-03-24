@@ -2,9 +2,12 @@ import {
   LayoutDashboard,
   Monitor,
   Package,
-  Tag,
+  FolderTree,
   Percent,
   ListVideo,
+  CalendarClock,
+  Database,
+  ScrollText,
   Settings,
 } from "lucide-react";
 
@@ -26,14 +29,17 @@ export const sidebarMenu: SidebarGroup[] = [
       { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
       { name: "Screens", icon: Monitor, path: "/screens" },
       { name: "Products", icon: Package, path: "/products" },
-      { name: "Brands", icon: Tag, path: "/brands" },
+      { name: "Categories", icon: FolderTree, path: "/categories" },
       { name: "Offers", icon: Percent, path: "/offers" },
-      { name: "Playlist", icon: ListVideo, path: "/playlists" },
+      { name: "Playlists", icon: ListVideo, path: "/playlists" },
+      { name: "Schedules", icon: CalendarClock, path: "/schedules" },
     ],
   },
   {
     label: "SYSTEM",
     items: [
+      { name: "Data Sync", icon: Database, path: "/ingestion" },
+      { name: "Logs", icon: ScrollText, path: "/logs" },
       { name: "Settings", icon: Settings, path: "/settings" },
     ],
   },

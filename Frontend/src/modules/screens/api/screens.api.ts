@@ -1,51 +1,73 @@
 import { apiSlice } from "@/shared/api/apiSlice";
-import { Screen } from "../types/screens.types";
-
+import type {
+  Screen,
+  ScreenStats,
+  CreateScreenPayload,
+  ScreensListParams,
+} from "../types/screens.types";
 
 export const screensApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-
-    getScreens: builder.query<Screen[], void>({
-      query: () => "/screens",
+    getScreens: builder.query<
+      { data: Screen[]; meta: { pagination: any } },
+      ScreensListParams | void
+    >({
+      query: (params) => ({
+        url: "/screens",
+        params: params || {},
+      }),
       providesTags: ["Screens"],
     }),
 
-    getScreenById: builder.query<Screen, string>({
-      query: (id) => `/screens/${id}`,
+    getScreenStats: builder.query<{ data: ScreenStats }, void>({
+      query: () => "/screens/stats",
+      providesTags: ["Screens"],
     }),
 
-    createScreen: builder.mutation({
+    getScreenById: builder.query<{ data: Screen }, string>({
+      query: (id) => `/screens/${id}`,
+      providesTags: (_result, _error, id) => [{ type: "Screens", id }],
+    }),
+
+    createScreen: builder.mutation<
+      { data: Screen & { rawDeviceSecret: string } },
+      CreateScreenPayload
+    >({
       query: (body) => ({
         url: "/screens",
         method: "POST",
-        body
-      })
+        body,
+      }),
+      invalidatesTags: ["Screens"],
     }),
 
-    updateScreen: builder.mutation({
-      query: ({ id, ...body }) => ({
+    updateScreen: builder.mutation<
+      { data: Screen },
+      { id: string; body: Partial<CreateScreenPayload> }
+    >({
+      query: ({ id, body }) => ({
         url: `/screens/${id}`,
         method: "PUT",
-        body
-      })
+        body,
+      }),
+      invalidatesTags: ["Screens"],
     }),
 
-    deleteScreen: builder.mutation({
+    deleteScreen: builder.mutation<void, string>({
       query: (id) => ({
         url: `/screens/${id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
-      invalidatesTags: ["Screens"]
-    })
-
+      invalidatesTags: ["Screens"],
+    }),
   }),
 });
 
 export const {
   useGetScreensQuery,
+  useGetScreenStatsQuery,
   useGetScreenByIdQuery,
   useCreateScreenMutation,
   useUpdateScreenMutation,
-  useDeleteScreenMutation
-
+  useDeleteScreenMutation,
 } = screensApi;

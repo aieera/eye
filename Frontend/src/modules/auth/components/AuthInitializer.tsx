@@ -1,28 +1,37 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "@/app/store";
-import { setCredentials, setLoading } from "../store/authSlice";
-import { getAccessToken } from "@/shared/utils/cookies";
-import { mockGetMe } from "../api/mockAuth";
+import { setCredentials, setLoading, logout } from "../store/authSlice";
+import { getAccessToken, clearTokens } from "@/shared/utils/cookies";
+import { useGetMeQuery } from "../api/authApi";
 
 const AuthInitializer = () => {
   const dispatch = useAppDispatch();
+  const token = getAccessToken();
+
+  const { data, error, isLoading } = useGetMeQuery(undefined, {
+    skip: !token,
+  });
 
   useEffect(() => {
-    const restoreSession = async () => {
-      const token = getAccessToken();
-      if (token) {
-        try {
-          const user = await mockGetMe(token);
-          dispatch(setCredentials({ user, accessToken: token }));
-        } catch {
-          dispatch(setLoading(false));
-        }
-      } else {
-        dispatch(setLoading(false));
-      }
-    };
-    restoreSession();
-  }, [dispatch]);
+    if (!token) {
+      dispatch(setLoading(false));
+      return;
+    }
+
+    if (isLoading) return;
+
+    if (data?.success && data.data) {
+      dispatch(
+        setCredentials({
+          user: data.data as any,
+          accessToken: token,
+        })
+      );
+    } else if (error) {
+      clearTokens();
+      dispatch(logout());
+    }
+  }, [data, error, isLoading, token, dispatch]);
 
   return null;
 };

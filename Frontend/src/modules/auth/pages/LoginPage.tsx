@@ -27,16 +27,18 @@ const LoginPage = () => {
     mode: "onChange",
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (formData: LoginFormData) => {
     try {
-      const result = await login(data).unwrap();
+      const result = await login(formData).unwrap();
 
-      setAccessToken(result.accessToken);
+      const { user, accessToken } = result.data;
+
+      setAccessToken(accessToken);
 
       dispatch(
         setCredentials({
-          user: result.user,
-          accessToken: result.accessToken,
+          user: user as any,
+          accessToken,
         })
       );
 
@@ -45,7 +47,7 @@ const LoginPage = () => {
         description: "Welcome back!",
       });
 
-      if (result.user.role === "admin") {
+      if (user.role === "admin") {
         navigate("/screens");
       } else {
         navigate("/");

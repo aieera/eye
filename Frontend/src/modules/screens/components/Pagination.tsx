@@ -1,54 +1,58 @@
-export default function Pagination({ page, setPage, totalPages }) {
+import { Button } from "@/components/ui/button";
 
+interface Props {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+export default function Pagination({ page, totalPages, onPageChange }: Props) {
   if (totalPages <= 1) return null;
-
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-  const goPrev = () => {
-    if (page > 1) setPage(page - 1);
-  };
-
-  const goNext = () => {
-    if (page < totalPages) setPage(page + 1);
-  };
 
   return (
     <div className="flex items-center justify-center gap-2 mt-6">
-
-      {/* Prev */}
-      <button
-        onClick={goPrev}
-        disabled={page === 1}
-        className="px-3 py-2 text-sm border rounded-xl shadow bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={page <= 1}
+        onClick={() => onPageChange(page - 1)}
       >
-        Prev
-      </button>
+        Previous
+      </Button>
 
-      {/* Page Numbers */}
-      {pages.map((p) => (
-        <button
-          key={p}
-          onClick={() => setPage(p)}
-          className={`w-8 h-9 text-sm rounded-xl shadow border flex items-center justify-center
-          ${
-            page === p
-              ? "bg-black text-white border-black"
-              : "bg-white text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-          {p}
-        </button>
-      ))}
+      {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+        let pageNum: number;
+        if (totalPages <= 5) {
+          pageNum = i + 1;
+        } else if (page <= 3) {
+          pageNum = i + 1;
+        } else if (page >= totalPages - 2) {
+          pageNum = totalPages - 4 + i;
+        } else {
+          pageNum = page - 2 + i;
+        }
 
-      {/* Next */}
-      <button
-        onClick={goNext}
-        disabled={page === totalPages}
-        className="px-3 py-2 text-sm border rounded-xl shadow bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
+        return (
+          <Button
+            key={pageNum}
+            variant={page === pageNum ? "default" : "outline"}
+            size="sm"
+            onClick={() => onPageChange(pageNum)}
+            className={page === pageNum ? "bg-purple-900 hover:bg-purple-800" : ""}
+          >
+            {pageNum}
+          </Button>
+        );
+      })}
+
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={page >= totalPages}
+        onClick={() => onPageChange(page + 1)}
       >
         Next
-      </button>
-
+      </Button>
     </div>
   );
 }

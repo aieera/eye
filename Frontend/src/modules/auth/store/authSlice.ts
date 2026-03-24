@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { User } from "@/shared/types/db";
+import { clearTokens } from "@/shared/utils/cookies";
 
 interface AuthState {
   user: User | null;
@@ -24,7 +25,6 @@ const authSlice = createSlice({
       action: PayloadAction<{
         user: User;
         accessToken: string;
-        refreshToken?: string;
       }>
     ) => {
       state.user = action.payload.user;
@@ -38,6 +38,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.isAuthenticated = false;
       state.isLoading = false;
+      clearTokens();
     },
 
     setLoading: (state, action: PayloadAction<boolean>) => {
