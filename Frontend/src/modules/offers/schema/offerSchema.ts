@@ -13,9 +13,9 @@ export const offerSchema = z.object({
     })
     .min(1, "Offer value must be greater than 0"),
 
-  startDate: z.string().min(1, "Start date required"),
+  offerStartDate: z.string().min(1, "Start date required"),
 
-  endDate: z.string().min(1, "End date required"),
+  offerEndDate: z.string().min(1, "End date required"),
 
   status: z.enum(["active", "inactive"]).default("active")
 });

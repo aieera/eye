@@ -3,9 +3,9 @@ import {
   Monitor,
   Package,
   Tag,
-  Percent,
   ListVideo,
   Settings,
+  BadgePercent,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -27,7 +27,7 @@ export const sidebarMenu: SidebarGroup[] = [
       { name: "Screens", icon: Monitor, path: "/screens" },
       { name: "Products", icon: Package, path: "/products" },
       { name: "Brands", icon: Tag, path: "/brands" },
-      { name: "Offers", icon: Percent, path: "/offers" },
+      { name: "Offers", icon: BadgePercent, path: "/offers" },
       { name: "Playlist", icon: ListVideo, path: "/playlists" },
     ],
   },

@@ -46,7 +46,7 @@ const LoginPage = () => {
       });
 
       if (result.user.role === "admin") {
-        navigate("/screens");
+        navigate("/dashboard");
       } else {
         navigate("/");
       }

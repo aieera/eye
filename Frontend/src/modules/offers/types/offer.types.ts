@@ -3,7 +3,7 @@ export type Offer = {
   name: string;
   offerType: "percentage" | "flat";
   offerValue: number;
-  startDate: string;
-  endDate: string;
+  offerStartDate: string;
+  offerEndDate: string;
   status: "active" | "inactive";
 };
