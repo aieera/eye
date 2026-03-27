@@ -43,11 +43,11 @@ export default function OfferTable({ offers }) {
               </td>
 
               <td className="px-6 py-4">
-                {offer.startDate}
+                {offer.offerStartDate}
               </td>
 
               <td className="px-6 py-4">
-                {offer.endDate}
+                {offer.offerEndDate}
               </td>
 
               <td className="px-6 py-4">

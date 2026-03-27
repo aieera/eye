@@ -10,8 +10,10 @@ import { playlistRoutes } from "@/modules/playlists/routes/playlistRoutes";
 import { productRoutes } from "@/modules/products/routes/productRoutes";
 import { offerRoutes } from "@/modules/offers/routes/offerRoutes";
 import { brandRoutes } from "@/modules/brands/routes/brandRoutes";
+import { dashboardRoutes } from "@/modules/dashboard/routes/dashboardRoutes";
 
 const protectedRoutes: ModuleRoute[] = [
+  ...dashboardRoutes,
   ...screenRoutes,
   ...playlistRoutes,
   ...productRoutes,

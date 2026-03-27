@@ -19,7 +19,8 @@ export const screensApi = apiSlice.injectEndpoints({
         url: "/screens",
         method: "POST",
         body
-      })
+      }),
+      invalidatesTags: ["Screens"],
     }),
 
     updateScreen: builder.mutation({
@@ -27,7 +28,8 @@ export const screensApi = apiSlice.injectEndpoints({
         url: `/screens/${id}`,
         method: "PUT",
         body
-      })
+      }),
+      invalidatesTags: ["Screens"],
     }),
 
     deleteScreen: builder.mutation({
