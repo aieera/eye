@@ -1,11 +1,10 @@
 import { Monitor, Package, Percent, ListVideo, AlertTriangle, RefreshCw } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import { useGetDashboardStatsQuery, useGetRecentActivityQuery } from "../api/dashboardApi";
-import PageContainer from "@/shared/components/PageContainer";
+import { useAppSelector } from "@/app/store";
 
 const STATUS_COLORS: Record<string, string> = {
   online: "#22c55e",
@@ -13,33 +12,11 @@ const STATUS_COLORS: Record<string, string> = {
   error: "#ef4444",
 };
 
-function StatCard({
-  title,
-  value,
-  sub,
-  icon: Icon,
-  variant = "default",
-}: {
-  title: string;
-  value: number | string;
-  sub?: string;
-  icon: any;
-  variant?: "default" | "warning" | "success";
-}) {
-  const iconColor =
-    variant === "warning" ? "text-destructive" : variant === "success" ? "text-green-500" : "text-primary";
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <Icon className={`h-4 w-4 ${iconColor}`} />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
-      </CardContent>
-    </Card>
-  );
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
 }
 
 function ActivityFeed({ limit = 15 }: { limit?: number }) {
@@ -47,10 +24,10 @@ function ActivityFeed({ limit = 15 }: { limit?: number }) {
 
   if (isLoading)
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
           <div key={i} className="flex gap-3 items-start">
-            <Skeleton className="h-2 w-2 rounded-full mt-1.5" />
+            <Skeleton className="h-2 w-2 rounded-full mt-1.5 flex-shrink-0" />
             <div className="flex-1 space-y-1">
               <Skeleton className="h-3 w-3/4" />
               <Skeleton className="h-3 w-1/4" />
@@ -64,38 +41,35 @@ function ActivityFeed({ limit = 15 }: { limit?: number }) {
     return <p className="text-sm text-muted-foreground py-4 text-center">No recent activity</p>;
 
   return (
-    <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-      {activities.map((item) => (
-        <div key={item.id} className="flex gap-3 items-start text-sm">
-          <span
-            className={`mt-1.5 h-2 w-2 rounded-full flex-shrink-0 ${
-              item.type === "system"
-                ? item.level === "error"
-                  ? "bg-destructive"
-                  : item.level === "warn"
-                  ? "bg-yellow-500"
-                  : "bg-blue-500"
-                : "bg-purple-500"
-            }`}
-          />
-          <div className="flex-1 min-w-0">
-            <p className="truncate text-foreground">
-              {item.type === "system"
-                ? `[${item.module}] ${item.action} — ${item.message}`
-                : `Screen: ${item.screen?.screenName ?? "?"} — ${item.eventType}`}
-            </p>
-            <p className="text-muted-foreground text-xs">
-              {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
-            </p>
+    <div className="relative space-y-0 max-h-72 overflow-y-auto pr-1">
+      <div className="absolute left-[5px] top-2 bottom-2 w-px bg-border/60" />
+      {activities.map((item) => {
+        const dotColor = item.type === "system"
+          ? item.level === "error" ? "bg-red-500" : item.level === "warn" ? "bg-amber-500" : "bg-blue-500"
+          : "bg-primary/60";
+        return (
+          <div key={item.id} className="flex gap-3 items-start text-sm py-2.5 pl-4 relative">
+            <span className={`absolute left-0 mt-1.5 h-2.5 w-2.5 rounded-full flex-shrink-0 ring-2 ring-background ${dotColor}`} />
+            <div className="flex-1 min-w-0">
+              <p className="truncate text-foreground text-xs">
+                {item.type === "system"
+                  ? `[${item.module}] ${item.action} — ${item.message}`
+                  : `Screen: ${item.screen?.screenName ?? "?"} — ${item.eventType}`}
+              </p>
+              <p className="text-muted-foreground text-[11px] mt-0.5">
+                {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
 export default function Dashboard() {
   const { data: stats, isLoading, refetch } = useGetDashboardStatsQuery();
+  const user = useAppSelector((state) => state.auth.user);
 
   const screenPieData = stats
     ? [
@@ -105,200 +79,156 @@ export default function Dashboard() {
       ].filter((d) => d.value > 0)
     : [];
 
+  const statCards = [
+    {
+      title: "Screens", icon: Monitor, iconBg: "bg-blue-50", iconColor: "text-blue-600",
+      value: stats?.screens.total ?? 0,
+      sub: stats ? `${stats.screens.online} online` : undefined,
+    },
+    {
+      title: "Products", icon: Package, iconBg: "bg-amber-50", iconColor: "text-amber-600",
+      value: stats?.products.total ?? 0,
+      sub: stats ? `${stats.products.synced} synced` : undefined,
+    },
+    {
+      title: "Active Offers", icon: Percent, iconBg: "bg-emerald-50", iconColor: "text-emerald-600",
+      value: stats?.offers.active ?? 0,
+      sub: "Running promotions",
+    },
+    {
+      title: "Playlists", icon: ListVideo, iconBg: "bg-purple-50", iconColor: "text-purple-600",
+      value: stats?.playlists.total ?? 0,
+      sub: stats ? `${stats.playlists.published} published` : undefined,
+    },
+  ];
+
   return (
-    <PageContainer
-      title="Dashboard"
-      actions={
+    <div className="p-6 space-y-6 animate-in fade-in duration-200">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-medium">
+            {getGreeting()}{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {format(new Date(), "EEEE, MMMM d, yyyy")}
+          </p>
+        </div>
         <button
           onClick={() => refetch()}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors h-8 px-3 rounded-lg hover:bg-muted/50"
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className="h-3.5 w-3.5" />
           Refresh
         </button>
-      }
-    >
-      {/* Stat Cards */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="pb-2">
-                <Skeleton className="h-4 w-24" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-16 mb-1" />
-                <Skeleton className="h-3 w-32" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : stats ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Total Screens"
-            value={stats.screens.total}
-            sub={`${stats.screens.online} online · ${stats.screens.offline} offline`}
-            icon={Monitor}
-            variant={stats.screens.error > 0 ? "warning" : "success"}
-          />
-          <StatCard
-            title="Products"
-            value={stats.products.total}
-            sub={`${stats.products.synced} synced · ${stats.products.withoutImages} missing images`}
-            icon={Package}
-          />
-          <StatCard
-            title="Active Offers"
-            value={stats.offers.active}
-            sub="Currently running promotions"
-            icon={Percent}
-            variant={stats.offers.active > 0 ? "success" : "default"}
-          />
-          <StatCard
-            title="Playlists"
-            value={stats.playlists.total}
-            sub={`${stats.playlists.published} published`}
-            icon={ListVideo}
-          />
-        </div>
-      ) : null}
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div key={card.title} className="bg-card rounded-xl border border-border/60 shadow-[0_1px_3px_0_rgb(0,0,0,0.02)] p-5 hover:shadow-md transition-shadow duration-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">{card.title}</p>
+                  {isLoading
+                    ? <Skeleton className="h-8 w-14 mt-1" />
+                    : <p className="text-3xl font-semibold tabular-nums mt-1">{card.value}</p>}
+                  {card.sub && !isLoading && <p className="text-xs text-muted-foreground mt-1">{card.sub}</p>}
+                </div>
+                <div className={`w-10 h-10 rounded-lg ${card.iconBg} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`w-5 h-5 ${card.iconColor}`} />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Screen Status Pie */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base">Screen Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-48 w-full rounded" />
-            ) : screenPieData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart>
-                  <Pie data={screenPieData} dataKey="value" cx="50%" cy="50%" outerRadius={65}>
-                    {screenPieData.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">No screens configured</p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="bg-card rounded-xl border border-border/60 shadow-[0_1px_3px_0_rgb(0,0,0,0.02)] p-5">
+          <h3 className="text-sm font-medium mb-4">Screen Overview</h3>
+          {isLoading ? (
+            <Skeleton className="h-44 w-full rounded" />
+          ) : screenPieData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={160}>
+              <PieChart>
+                <Pie data={screenPieData} dataKey="value" cx="50%" cy="50%" outerRadius={60}>
+                  {screenPieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                </Pie>
+                <Tooltip />
+                <Legend iconType="circle" iconSize={8} />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-8">No screens configured</p>
+          )}
+        </div>
 
         {/* Last Sync */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base">Last Oracle Sync</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-4 w-40" />
-              </div>
-            ) : stats?.lastSync ? (
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Status</span>
-                  <Badge
-                    variant={
-                      stats.lastSync.status === "success"
-                        ? "default"
-                        : stats.lastSync.status === "failed"
-                        ? "destructive"
-                        : "secondary"
-                    }
-                  >
-                    {stats.lastSync.status}
-                  </Badge>
+        <div className="bg-card rounded-xl border border-border/60 shadow-[0_1px_3px_0_rgb(0,0,0,0.02)] p-5">
+          <h3 className="text-sm font-medium mb-4">Last Oracle Sync</h3>
+          {isLoading ? (
+            <div className="space-y-2">
+              {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
+            </div>
+          ) : stats?.lastSync ? (
+            <div className="space-y-2.5 text-sm">
+              {[
+                { label: "Status", value: <Badge variant={stats.lastSync.status === "success" ? "default" : stats.lastSync.status === "failed" ? "destructive" : "secondary"}>{stats.lastSync.status}</Badge> },
+                { label: "Connection", value: stats.lastSync.connection?.name ?? "—" },
+                { label: "Processed", value: stats.lastSync.recordsProcessed.toLocaleString() },
+                { label: "When", value: formatDistanceToNow(new Date(stats.lastSync.startedAt), { addSuffix: true }) },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-xs">{label}</span>
+                  <span className="text-xs font-medium">{value as any}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Connection</span>
-                  <span className="font-medium">{stats.lastSync.connection?.name ?? "—"}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Type</span>
-                  <span>{stats.lastSync.syncType}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Processed</span>
-                  <span>{stats.lastSync.recordsProcessed.toLocaleString()}</span>
-                </div>
-                {stats.lastSync.recordsFailed > 0 && (
-                  <div className="flex items-center justify-between text-destructive">
-                    <span>Failed</span>
-                    <span>{stats.lastSync.recordsFailed}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">When</span>
-                  <span className="text-xs">
-                    {formatDistanceToNow(new Date(stats.lastSync.startedAt), { addSuffix: true })}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">No sync history</p>
-            )}
-          </CardContent>
-        </Card>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-4">No sync history</p>
+          )}
+        </div>
 
         {/* Error Summary */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive" />
-              Error Summary (24h)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
+        <div className="bg-card rounded-xl border border-border/60 shadow-[0_1px_3px_0_rgb(0,0,0,0.02)] p-5">
+          <h3 className="text-sm font-medium mb-4 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+            Errors (24h)
+          </h3>
+          {isLoading ? (
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
+            </div>
+          ) : stats ? (
+            <div className="space-y-3 text-sm">
+              {[
+                { label: "System errors", val: stats.errors.system },
+                { label: "Screen errors", val: stats.errors.screen },
+              ].map(({ label, val }) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-xs">{label}</span>
+                  <Badge variant={val > 0 ? "destructive" : "secondary"}>{val}</Badge>
+                </div>
+              ))}
+              <div className="flex items-center justify-between border-t border-border/40 pt-2.5">
+                <span className="text-xs font-medium">Total</span>
+                <Badge variant={stats.errors.total > 0 ? "destructive" : "default"}>{stats.errors.total}</Badge>
               </div>
-            ) : stats ? (
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">System errors</span>
-                  <Badge variant={stats.errors.system > 0 ? "destructive" : "secondary"}>
-                    {stats.errors.system}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Screen errors</span>
-                  <Badge variant={stats.errors.screen > 0 ? "destructive" : "secondary"}>
-                    {stats.errors.screen}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between font-medium border-t pt-2 mt-2">
-                  <span>Total</span>
-                  <Badge variant={stats.errors.total > 0 ? "destructive" : "default"}>
-                    {stats.errors.total}
-                  </Badge>
-                </div>
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Recent Activity */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-base">Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ActivityFeed />
-        </CardContent>
-      </Card>
-    </PageContainer>
+      <div className="bg-card rounded-xl border border-border/60 shadow-[0_1px_3px_0_rgb(0,0,0,0.02)] p-5">
+        <h3 className="text-sm font-medium mb-4">Recent Activity</h3>
+        <ActivityFeed />
+      </div>
+    </div>
   );
 }

@@ -2,14 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAppDispatch } from "@/app/store";
 import { setCredentials } from "@/modules/auth/store/authSlice";
 import { setAccessToken } from "@/shared/utils/cookies";
 import { loginSchema, type LoginFormData } from "../schema/authSchema";
 import { useLoginMutation } from "../api/authApi";
-import Gradient from "@/assets/Gradient.png";
-import Logo from "@/assets/Raabytlogo.png";
 import { toast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
@@ -30,29 +28,18 @@ const LoginPage = () => {
   const onSubmit = async (formData: LoginFormData) => {
     try {
       const result = await login(formData).unwrap();
-
       const { user, accessToken } = result.data;
 
       setAccessToken(accessToken);
+      dispatch(setCredentials({ user: user as any, accessToken }));
 
-      dispatch(
-        setCredentials({
-          user: user as any,
-          accessToken,
-        })
-      );
-
-      toast({
-        title: "Login Successful",
-        description: "Welcome back!",
-      });
+      toast({ title: "Login Successful", description: "Welcome back!" });
 
       if (user.role === "admin") {
         navigate("/screens");
       } else {
         navigate("/");
       }
-
     } catch (err: any) {
       toast({
         title: "Login Failed",
@@ -63,145 +50,111 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-
-      {/* Background Image */}
-      <img
-        src={Gradient}
-        alt="Background"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-
-      {/* Dark Overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/30" />
-
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl flex items-center justify-between px-20">
-
-        {/* LEFT SECTION */}
-        <div className="text-white max-w-xl space-y-6 flex flex-col items-center text-center">
-
-          {/* LOGO */}
-          <img
-            src={Logo}
-            alt="Logo"
-            className="w-40 object-contain mb-0"
-          />
-
-          <h1 className="text-5xl font-semibold tracking-tight">
-            Screen Display System
-          </h1>
-
-          <p className="text-lg text-gray-200 leading-relaxed">
-            A platform for creating, managing, and publishing content
-            from a centralized interface.
-          </p>
-
+    <div className="min-h-screen flex">
+      {/* Left — brand wall */}
+      <div className="hidden md:flex w-[55%] flex-col items-center justify-center relative bg-[#1e1b4b] overflow-hidden">
+        {/* Dot grid */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+          }}
+        />
+        <div className="relative z-10 text-center px-12">
+          <h1 className="text-6xl font-bold text-white tracking-tight">Eye</h1>
+          <p className="text-lg text-white/60 font-light mt-2">Digital Signage Platform</p>
+          <div className="flex items-center gap-3 mt-8 justify-center flex-wrap">
+            {["Multi-Location", "Real-time Sync", "Oracle Connected"].map((tag) => (
+              <span
+                key={tag}
+                className="border border-white/20 text-white/60 text-xs px-3 py-1.5 rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* RIGHT LOGIN CARD */}
-        <div className="w-[430px] bg-[#F1F1F1] rounded-2xl 
-        shadow-[0_40px_100px_rgba(0,0,0,0.6)] p-10">
+      {/* Right — form */}
+      <div className="flex-1 flex items-center justify-center bg-card p-8">
+        <div className="w-full max-w-sm">
+          <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
+          <p className="text-sm text-muted-foreground mt-1 mb-8">Sign in to your account</p>
 
-          <h2 className="text-2xl font-bold mb-1">
-            Welcome back
-          </h2>
-
-          <p className="text-gray-600 text-sm mb-6">
-            Enter your details to continue.
-          </p>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
-            {/* EMAIL */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Email
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-foreground">
+                Email address
               </label>
               <input
+                id="email"
                 type="email"
                 {...register("email")}
-                placeholder="Input your email"
-                className="mt-1 w-full p-3 rounded-lg border border-gray-300 
-              bg-white shadow-sm
-              focus:outline-none focus:ring-2 focus:ring-purple-600"
+                placeholder="you@example.com"
+                className="w-full h-9 rounded-lg border border-border bg-background px-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
               {errors.email && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.email.message}
-                </p>
+                <p className="text-xs text-destructive">{errors.email.message}</p>
               )}
             </div>
 
-            {/* PASSWORD */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
+            {/* Password */}
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-sm font-medium text-foreground">
                 Password
               </label>
-
-              <div className="relative mt-1">
-
+              <div className="relative">
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
-                  placeholder="Enter password"
-                  className="w-full p-3 rounded-lg border border-gray-300 
-      bg-white shadow-sm
-      focus:outline-none focus:ring-2 focus:ring-purple-600"
+                  placeholder="Enter your password"
+                  className="w-full h-9 rounded-lg border border-border bg-background px-3 pr-9 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-500"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <Eye size={18} />
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
-
               </div>
-
               {errors.password && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.password.message}
-                </p>
+                <p className="text-xs text-destructive">{errors.password.message}</p>
               )}
             </div>
 
-            {/* REMEMBER + FORGOT */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-gray-700">
-                <input type="checkbox" className="accent-purple-600" />
-                Remember Me
+            {/* Remember + Forgot */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                <input type="checkbox" className="rounded border-border accent-primary" />
+                Remember me
               </label>
-
               <button
                 type="button"
                 onClick={() => navigate("/auth/forgot-password")}
-                className="text-blue-600 hover:underline"
+                className="text-sm text-primary hover:underline"
               >
-                Forgot Password?
+                Forgot password?
               </button>
             </div>
 
-            {/* BUTTON */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={!isValid || isLoading}
-              className={`w-full py-3 rounded-lg font-medium flex justify-center items-center transition-all duration-300
-    ${isValid
-                  ? "bg-gradient-to-r from-purple-600 to-purple-800 text-white hover:opacity-90"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }
-  `}
+              className="w-full h-9 rounded-lg bg-primary text-primary-foreground text-sm font-medium shadow-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                "Login"
-              )}
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
             </button>
-
           </form>
+
+          <p className="text-xs text-muted-foreground text-center mt-6">
+            Need help? Contact your administrator
+          </p>
         </div>
       </div>
     </div>

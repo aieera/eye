@@ -1,19 +1,14 @@
 import { useState } from "react";
-import ScreenStatusBadge from "./ScreenStatusBadge";
-import { Copy, Check, Pencil, Trash2 } from "lucide-react";
+import { Copy, Check, Pencil, Trash2, Monitor } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useDeleteScreenMutation } from "../api/screens.api";
+import ScreenStatusBadge from "./ScreenStatusBadge";
 import type { Screen } from "../types/screens.types";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
@@ -30,7 +25,7 @@ export default function ScreenTable({ screens }: Props) {
   const copyToClipboard = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
     setCopiedId(id);
-    toast({ title: "Screen code copied", className: "border-green-200 bg-gray-50 shadow" });
+    toast({ title: "Screen code copied" });
     setTimeout(() => setCopiedId(null), 1500);
   };
 
@@ -39,83 +34,82 @@ export default function ScreenTable({ screens }: Props) {
       await deleteScreen(id).unwrap();
       toast({ title: "Screen deleted" });
     } catch {
-      toast({ title: "Error deleting screen" });
+      toast({ title: "Error deleting screen", variant: "destructive" });
     }
   };
 
   if (screens.length === 0) {
     return (
-      <div className="bg-white rounded-xl border p-12 text-center">
-        <p className="text-gray-500">No screens found</p>
-        <p className="text-sm text-gray-400 mt-1">Create your first screen to get started</p>
+      <div className="rounded-xl border border-border/60 bg-card p-16 text-center">
+        <div className="w-12 h-12 rounded-xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
+          <Monitor className="w-6 h-6 text-muted-foreground/40" />
+        </div>
+        <p className="text-sm font-medium text-foreground mb-1">No screens found</p>
+        <p className="text-xs text-muted-foreground">Create your first screen to get started</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden border">
-      <table className="w-full text-md">
-        <thead className="bg-gray-200">
-          <tr className="text-left">
-            <th className="px-4 py-3"></th>
-            <th className="px-6 py-3 font-normal">Screen name</th>
-            <th className="px-6 py-3 font-normal">Location</th>
-            <th className="px-6 py-3 font-normal">Screen code</th>
-            <th className="px-6 py-3 font-normal">Status</th>
-            <th className="px-6 py-3 font-normal">Created</th>
-            <th className="px-6 py-3 font-normal">Last heartbeat</th>
-            <th className="px-6 py-3 font-normal">Action</th>
+    <div className="rounded-xl border border-border/60 overflow-hidden">
+      <table className="w-full">
+        <thead className="bg-muted/40">
+          <tr>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Screen</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Location</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Seen</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Created</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-20">Actions</th>
           </tr>
         </thead>
-        <tbody className="text-gray-700">
+        <tbody className="divide-y divide-border/40 bg-card">
           {screens.map((screen) => (
-            <tr
-              key={screen.id}
-              className="border-t border-gray-200 hover:bg-gray-50"
-            >
-              <td className="px-4 py-4">
-                <input type="checkbox" />
-              </td>
-              <td className="px-6 py-4">{screen.screenName}</td>
-              <td className="px-6 py-4">{screen.location?.name ?? "—"}</td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs">{screen.screenCode}</span>
+            <tr key={screen.id} className="hover:bg-muted/20 transition-colors group">
+              <td className="px-4 py-3.5">
+                <p className="text-sm font-medium text-foreground">{screen.screenName}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <p className="text-xs font-mono text-muted-foreground">{screen.screenCode}</p>
                   <button
                     onClick={() => copyToClipboard(screen.screenCode, screen.id)}
-                    className="text-gray-400 hover:text-black"
+                    className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
                   >
                     {copiedId === screen.id ? (
-                      <Check size={16} className="text-green-600" />
+                      <Check className="w-3 h-3 text-emerald-500" />
                     ) : (
-                      <Copy size={16} />
+                      <Copy className="w-3 h-3" />
                     )}
                   </button>
                 </div>
               </td>
-              <td className="px-6 py-4">
+              <td className="px-4 py-3.5">
+                <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-md">
+                  {screen.location?.name ?? "—"}
+                </span>
+              </td>
+              <td className="px-4 py-3.5">
                 <ScreenStatusBadge status={screen.status} />
               </td>
-              <td className="px-6 py-4 text-sm">
-                {new Date(screen.createdAt).toLocaleDateString()}
-              </td>
-              <td className="px-6 py-4 text-sm">
+              <td className="px-4 py-3.5 text-sm text-muted-foreground">
                 {screen.lastHeartbeat
-                  ? new Date(screen.lastHeartbeat).toLocaleString()
+                  ? formatDistanceToNow(new Date(screen.lastHeartbeat), { addSuffix: true })
                   : "Never"}
               </td>
-              <td className="px-6 py-4">
-                <div className="flex gap-2">
+              <td className="px-4 py-3.5 text-sm text-muted-foreground">
+                {new Date(screen.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </td>
+              <td className="px-4 py-3.5">
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => navigate(`/screens/${screen.id}`)}
-                    className="p-1 hover:text-purple-700"
+                    className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Pencil size={16} />
+                    <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <button className="p-1 hover:text-red-500">
-                        <Trash2 size={16} />
+                      <button className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -127,9 +121,7 @@ export default function ScreenTable({ screens }: Props) {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(screen.id)}>
-                          Delete
-                        </AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleDelete(screen.id)}>Delete</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>

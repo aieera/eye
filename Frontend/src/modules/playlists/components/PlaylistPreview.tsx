@@ -34,8 +34,8 @@ export default function PlaylistPreview({
 
   if (items.length === 0) {
     return (
-      <div className="aspect-[16/10] bg-gray-900 rounded-xl flex items-center justify-center">
-        <p className="text-gray-500 text-sm">No items to preview</p>
+      <div className="aspect-[16/10] bg-muted/60 rounded-xl border border-border/60 flex items-center justify-center">
+        <p className="text-muted-foreground text-sm">No items to preview</p>
       </div>
     );
   }
@@ -130,7 +130,7 @@ export default function PlaylistPreview({
   };
 
   return (
-    <div className="aspect-[16/10] bg-gray-900 rounded-xl overflow-hidden shadow-lg border-2 border-gray-700">
+    <div className="aspect-[16/10] bg-zinc-900 rounded-xl overflow-hidden shadow-lg border border-zinc-700">
       {renderContent()}
     </div>
   );

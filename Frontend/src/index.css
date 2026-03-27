@@ -1,8 +1,84 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Poppins', sans-serif;
+@layer base {
+  :root {
+    --background: 220 14% 97.5%;
+    --foreground: 220 15% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 12%;
+    --primary: 250 60% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 13% 95%;
+    --secondary-foreground: 220 15% 12%;
+    --muted: 220 13% 95%;
+    --muted-foreground: 220 8% 46%;
+    --accent: 220 13% 95%;
+    --accent-foreground: 220 15% 12%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 250 60% 52%;
+    --radius: 0.5rem;
+    --success: 152 60% 42%;
+    --warning: 38 92% 50%;
+    --danger: 0 72% 51%;
+  }
+
+  .dark {
+    --background: 224 20% 9%;
+    --foreground: 220 15% 93%;
+    --card: 224 20% 12%;
+    --card-foreground: 220 15% 93%;
+    --popover: 224 20% 12%;
+    --popover-foreground: 220 15% 93%;
+    --primary: 250 60% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 224 20% 15%;
+    --secondary-foreground: 220 15% 93%;
+    --muted: 224 20% 15%;
+    --muted-foreground: 220 8% 50%;
+    --accent: 224 20% 15%;
+    --accent-foreground: 220 15% 93%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 224 15% 20%;
+    --input: 224 15% 20%;
+    --ring: 250 60% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "DM Sans", system-ui, sans-serif;
+  }
+}
+
+.font-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fade-in;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
 }

@@ -170,13 +170,13 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6 animate-in fade-in duration-200">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="text-2xl font-semibold tracking-tight">
             {id ? "Edit Product" : "Add Product"}
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Products / {id ? form.name || "Edit" : "New Product"}
           </p>
         </div>
@@ -206,7 +206,7 @@ export default function ProductDetail() {
       <div className="grid grid-cols-3 gap-6">
         {/* Left: Form */}
         <div className="col-span-2 space-y-6">
-          <div className="bg-gray-100 rounded-xl p-6 space-y-4">
+          <div className="bg-card rounded-xl border border-border/60 p-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Item Code *</Label>
@@ -290,7 +290,7 @@ export default function ProductDetail() {
 
           {/* Prices (edit mode only) */}
           {id && (
-            <div className="bg-gray-100 rounded-xl p-6 space-y-4">
+            <div className="bg-card rounded-xl border border-border/60 p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Prices (AED)</h3>
                 <Button variant="outline" size="sm" onClick={addPriceRow}>
@@ -364,7 +364,7 @@ export default function ProductDetail() {
                   </Button>
                 </div>
               ) : (
-                <p className="text-sm text-gray-400">No prices set. Add a price row above.</p>
+                <p className="text-sm text-muted-foreground">No prices set. Add a price row above.</p>
               )}
             </div>
           )}
@@ -372,14 +372,14 @@ export default function ProductDetail() {
 
         {/* Right: Image */}
         <div className="space-y-6">
-          <div className="bg-gray-100 rounded-xl p-6 space-y-4">
-            <h3 className="font-semibold">Image</h3>
-            <div className="w-full aspect-square bg-white rounded-lg border flex items-center justify-center overflow-hidden">
+          <div className="bg-card rounded-xl border border-border/60 p-5 space-y-4">
+            <h3 className="text-sm font-medium">Image</h3>
+            <div className="w-full aspect-square bg-muted/40 rounded-lg border border-border/60 flex items-center justify-center overflow-hidden">
               {form.imageUrl ? (
                 <img src={form.imageUrl} alt="" className="w-full h-full object-cover" />
               ) : (
-                <div className="text-center text-gray-400">
-                  <ImageOff size={32} className="mx-auto mb-2" />
+                <div className="text-center text-muted-foreground">
+                  <ImageOff size={32} className="mx-auto mb-2 opacity-30" />
                   <p className="text-xs">No image</p>
                 </div>
               )}
@@ -411,7 +411,7 @@ export default function ProductDetail() {
         <Button
           onClick={handleSubmit}
           disabled={creating || updating}
-          className="bg-purple-900 hover:bg-purple-800"
+          className="bg-primary hover:bg-primary/90"
         >
           {creating || updating ? "Saving..." : "Save"}
         </Button>

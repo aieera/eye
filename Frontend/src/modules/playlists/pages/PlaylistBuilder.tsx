@@ -61,22 +61,22 @@ function SortableItem({ item, onRemove }: { item: PlaylistItem; onRemove: () => 
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-3 bg-white rounded-lg border p-3 hover:shadow-sm">
-      <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-gray-400">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-3 bg-card rounded-lg border border-border/60 p-3 hover:shadow-sm transition-shadow">
+      <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground">
         <GripVertical size={18} />
       </button>
-      <span className="text-xs text-gray-400 w-6">#{item.displayOrder + 1}</span>
+      <span className="text-xs text-muted-foreground/50 w-6">#{item.displayOrder + 1}</span>
       {getThumb()}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{getItemLabel()}</p>
         <div className="flex items-center gap-2 mt-1">
-          <span className={`text-xs px-1.5 py-0.5 rounded ${typeColors[item.itemType] || ""}`}>
+          <span className={`text-xs px-1.5 py-0.5 rounded-md font-medium ${typeColors[item.itemType] || "bg-muted text-muted-foreground"}`}>
             {item.itemType}
           </span>
-          <span className="text-xs text-gray-400">{item.displayDurationSeconds}s</span>
+          <span className="text-xs text-muted-foreground">{item.displayDurationSeconds}s</span>
         </div>
       </div>
-      <button onClick={onRemove} className="p-1 text-gray-400 hover:text-red-500">
+      <button onClick={onRemove} className="p-1 text-muted-foreground/50 hover:text-red-500 transition-colors">
         <Trash2 size={16} />
       </button>
     </div>
@@ -188,19 +188,19 @@ export default function PlaylistBuilder() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6 animate-in fade-in duration-200">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{id ? "Edit Playlist" : "Create Playlist"}</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-semibold tracking-tight">{id ? "Edit Playlist" : "Create Playlist"}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-2">
             Playlists / {id ? form.name || "Edit" : "New"}
-            {playlist && <Badge variant="secondary" className="ml-2">v{playlist.version} — {playlist.status}</Badge>}
+            {playlist && <Badge variant="secondary" className="font-mono text-xs">v{playlist.version} — {playlist.status}</Badge>}
           </p>
         </div>
       </div>
 
       {/* Metadata */}
-      <div className="bg-gray-100 rounded-xl p-6">
+      <div className="bg-card rounded-xl border border-border/60 p-5">
         <div className="grid grid-cols-3 gap-4">
           <div>
             <Label>Name *</Label>
@@ -245,15 +245,15 @@ export default function PlaylistBuilder() {
         {/* Items List (3 cols) */}
         <div className="col-span-3 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Playlist Items ({items.length})</h3>
+            <h3 className="text-sm font-medium">Playlist Items ({items.length})</h3>
             <Button size="sm" onClick={() => setAddDialogOpen(true)} disabled={!id}>
               <Plus size={16} className="mr-1" /> Add Item
             </Button>
           </div>
-          {!id && <p className="text-sm text-gray-400">Save the playlist first to add items.</p>}
+          {!id && <p className="text-sm text-muted-foreground">Save the playlist first to add items.</p>}
           {id && items.length === 0 && (
-            <div className="border rounded-xl p-8 text-center bg-white">
-              <p className="text-gray-500">No items yet. Add products, offers, or custom content.</p>
+            <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
+              <p className="text-sm text-muted-foreground">No items yet. Add products, offers, or custom content.</p>
             </div>
           )}
           {id && items.length > 0 && (
@@ -271,7 +271,7 @@ export default function PlaylistBuilder() {
 
         {/* Preview (2 cols) */}
         <div className="col-span-2 space-y-4">
-          <h3 className="font-semibold">Preview</h3>
+          <h3 className="text-sm font-medium">Preview</h3>
           <PlaylistPreview
             items={items}
             transitionType={form.transitionType}
@@ -290,7 +290,7 @@ export default function PlaylistBuilder() {
             <Button variant="outline" size="icon" onClick={() => setPreviewIndex((previewIndex + 1) % Math.max(1, items.length))} disabled={items.length === 0}>
               <SkipForward size={16} />
             </Button>
-            <span className="text-xs text-gray-400 ml-2">
+            <span className="text-xs text-muted-foreground ml-2">
               {items.length > 0 ? `Item ${previewIndex + 1} of ${items.length}` : "No items"}
             </span>
           </div>
@@ -298,15 +298,15 @@ export default function PlaylistBuilder() {
       </div>
 
       {/* Bottom bar */}
-      <div className="flex justify-between items-center border-t pt-4">
-        <div className="text-sm text-gray-400">
+      <div className="flex justify-between items-center border-t border-border/60 pt-4">
+        <div className="text-sm text-muted-foreground">
           {playlist?.updatedAt && `Last saved: ${new Date(playlist.updatedAt).toLocaleString()}`}
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => navigate("/playlists")}>Cancel</Button>
           <Button variant="outline" onClick={handleSave} disabled={creating}>Save Draft</Button>
           {id && (
-            <Button onClick={() => setPublishDialogOpen(true)} className="bg-purple-900 hover:bg-purple-800" disabled={items.length === 0}>
+            <Button onClick={() => setPublishDialogOpen(true)} className="bg-primary hover:bg-primary/90" disabled={items.length === 0}>
               Publish
             </Button>
           )}

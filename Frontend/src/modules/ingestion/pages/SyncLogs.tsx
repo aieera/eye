@@ -8,15 +8,15 @@ import {
 import Pagination from "@/modules/screens/components/Pagination";
 
 const statusColors: Record<string, string> = {
-  success: "bg-green-100 text-green-700",
-  failed: "bg-red-100 text-red-700",
-  running: "bg-blue-100 text-blue-700",
+  success: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  failed: "bg-red-50 text-red-700 border border-red-200",
+  running: "bg-blue-50 text-blue-700 border border-blue-200",
 };
 
 const typeColors: Record<string, string> = {
-  full: "border-purple-200 text-purple-700",
+  full: "border-primary/20 text-primary",
   incremental: "border-blue-200 text-blue-700",
-  "price-only": "border-orange-200 text-orange-700",
+  "price-only": "border-amber-200 text-amber-700",
 };
 
 export default function SyncLogs() {
@@ -44,15 +44,15 @@ export default function SyncLogs() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-5 animate-in fade-in duration-200">
       <div>
-        <h1 className="text-2xl font-semibold">Sync Logs</h1>
-        <p className="text-sm text-gray-500">Data Sync / Logs</p>
+        <h1 className="text-2xl font-semibold tracking-tight">Sync Logs</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Data Sync / Logs</p>
       </div>
 
       <div className="flex gap-3">
         <Select value={statusFilter || "all"} onValueChange={(v) => { setStatusFilter(v === "all" ? undefined : v); setPage(1); }}>
-          <SelectTrigger className="w-36 bg-white shadow border"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-36 h-9 text-sm bg-card"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="success">Success</SelectItem>
@@ -61,7 +61,7 @@ export default function SyncLogs() {
           </SelectContent>
         </Select>
         <Select value={typeFilter || "all"} onValueChange={(v) => { setTypeFilter(v === "all" ? undefined : v); setPage(1); }}>
-          <SelectTrigger className="w-40 bg-white shadow border"><SelectValue placeholder="Type" /></SelectTrigger>
+          <SelectTrigger className="w-40 h-9 text-sm bg-card"><SelectValue placeholder="Type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="full">Full</SelectItem>
@@ -72,52 +72,54 @@ export default function SyncLogs() {
       </div>
 
       {isLoading ? (
-        <div className="bg-white rounded-xl border p-12 text-center"><p className="text-gray-500">Loading...</p></div>
+        <div className="rounded-xl border border-border/60 bg-card p-12 text-center"><p className="text-sm text-muted-foreground">Loading...</p></div>
       ) : logs.length === 0 ? (
-        <div className="bg-white rounded-xl border p-12 text-center">
-          <p className="text-gray-500">No sync logs found</p>
+        <div className="rounded-xl border border-border/60 bg-card p-12 text-center">
+          <p className="text-sm text-muted-foreground">No sync logs found</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border overflow-hidden">
+        <div className="rounded-xl border border-border/60 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-200">
+            <thead className="bg-muted/40">
               <tr className="text-left">
-                <th className="px-4 py-3 font-normal">Date</th>
-                <th className="px-4 py-3 font-normal">Type</th>
-                <th className="px-4 py-3 font-normal">Status</th>
-                <th className="px-4 py-3 font-normal">Processed</th>
-                <th className="px-4 py-3 font-normal">Created</th>
-                <th className="px-4 py-3 font-normal">Updated</th>
-                <th className="px-4 py-3 font-normal">Failed</th>
-                <th className="px-4 py-3 font-normal">Duration</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Processed</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Created</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Updated</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Failed</th>
+                <th className="px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Duration</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/40 bg-card">
               {logs.map((log: any) => (
                 <>
                   <tr
                     key={log.id}
-                    className="border-t hover:bg-gray-50 cursor-pointer"
+                    className="hover:bg-muted/20 transition-colors cursor-pointer"
                     onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}
                   >
-                    <td className="px-4 py-3 text-xs">{new Date(log.startedAt).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{new Date(log.startedAt).toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <Badge variant="outline" className={typeColors[log.syncType] || ""}>{log.syncType}</Badge>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-1 rounded-full ${statusColors[log.status] || ""}`}>{log.status}</span>
+                      <span className={`text-xs font-medium px-2.5 py-0.5 rounded-md ${statusColors[log.status] || "bg-muted text-muted-foreground"}`}>{log.status}</span>
                     </td>
-                    <td className="px-4 py-3">{log.recordsProcessed}</td>
-                    <td className="px-4 py-3 text-green-600">{log.recordsCreated}</td>
-                    <td className="px-4 py-3 text-blue-600">{log.recordsUpdated}</td>
-                    <td className="px-4 py-3 text-red-600">{log.recordsFailed}</td>
-                    <td className="px-4 py-3 text-gray-500">{getDuration(log)}</td>
+                    <td className="px-4 py-3 tabular-nums">{log.recordsProcessed}</td>
+                    <td className="px-4 py-3 text-emerald-600 tabular-nums">{log.recordsCreated}</td>
+                    <td className="px-4 py-3 text-blue-600 tabular-nums">{log.recordsUpdated}</td>
+                    <td className="px-4 py-3 tabular-nums">
+                      {log.recordsFailed > 0 ? <span className="text-red-600 font-medium">{log.recordsFailed}</span> : <span className="text-muted-foreground">0</span>}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{getDuration(log)}</td>
                   </tr>
                   {expandedLog === log.id && log.errorMessage && (
-                    <tr key={`${log.id}-err`} className="bg-red-50">
+                    <tr key={`${log.id}-err`} className="bg-red-50/50">
                       <td colSpan={8} className="px-4 py-3">
                         <p className="text-xs font-medium text-red-700 mb-1">Error Details:</p>
-                        <pre className="text-xs text-red-600 whitespace-pre-wrap">{log.errorMessage}</pre>
+                        <pre className="text-xs text-red-600 whitespace-pre-wrap font-mono">{log.errorMessage}</pre>
                       </td>
                     </tr>
                   )}

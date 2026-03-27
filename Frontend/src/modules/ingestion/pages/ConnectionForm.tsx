@@ -94,13 +94,13 @@ export default function ConnectionForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6 animate-in fade-in duration-200">
       <div>
-        <h1 className="text-2xl font-semibold">{id ? "Edit Connection" : "Add Connection"}</h1>
-        <p className="text-sm text-gray-500">Data Sync / {id ? "Edit" : "New Connection"}</p>
+        <h1 className="text-2xl font-semibold tracking-tight">{id ? "Edit Connection" : "Add Connection"}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Data Sync / {id ? "Edit" : "New Connection"}</p>
       </div>
 
-      <div className="bg-gray-100 rounded-xl p-6 space-y-4 max-w-2xl">
+      <div className="bg-card rounded-xl border border-border/60 p-5 space-y-4 max-w-2xl">
         <div>
           <Label>Connection Name *</Label>
           <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Oracle Production" />
@@ -134,7 +134,7 @@ export default function ConnectionForm() {
         </div>
 
         {id && (
-          <p className="text-xs text-gray-400">Leave host/port/username/password blank to keep existing values.</p>
+          <p className="text-xs text-muted-foreground">Leave host/port/username/password blank to keep existing values.</p>
         )}
 
         <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export default function ConnectionForm() {
 
       <div className="flex gap-3">
         <Button variant="outline" onClick={() => navigate("/ingestion")}>Cancel</Button>
-        <Button onClick={handleSave} disabled={creating || updating} className="bg-purple-900 hover:bg-purple-800">
+        <Button onClick={handleSave} disabled={creating || updating} className="bg-primary hover:bg-primary/90">
           {creating || updating ? "Saving..." : "Save"}
         </Button>
       </div>

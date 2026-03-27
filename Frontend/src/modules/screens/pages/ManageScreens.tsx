@@ -12,18 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 
 export default function ManageScreens() {
@@ -70,39 +62,17 @@ export default function ManageScreens() {
       toast({ title: "Please fill required fields" });
       return;
     }
-
     try {
       if (id) {
-        await updateScreen({
-          id,
-          body: {
-            screenName: form.screenName,
-            locationId: form.locationId,
-            orientation: form.orientation,
-            resolution: form.resolution || undefined,
-          },
-        }).unwrap();
+        await updateScreen({ id, body: { screenName: form.screenName, locationId: form.locationId, orientation: form.orientation, resolution: form.resolution || undefined } }).unwrap();
         toast({ title: "Screen updated" });
         navigate("/screens");
       } else {
-        const result = await createScreen({
-          screenName: form.screenName,
-          locationId: form.locationId,
-          orientation: form.orientation,
-          resolution: form.resolution || undefined,
-        }).unwrap();
-
-        setCreatedSecret({
-          screenCode: result.data.screenCode,
-          deviceToken: result.data.deviceToken,
-          rawDeviceSecret: result.data.rawDeviceSecret,
-        });
+        const result = await createScreen({ screenName: form.screenName, locationId: form.locationId, orientation: form.orientation, resolution: form.resolution || undefined }).unwrap();
+        setCreatedSecret({ screenCode: result.data.screenCode, deviceToken: result.data.deviceToken, rawDeviceSecret: result.data.rawDeviceSecret });
       }
     } catch (err: any) {
-      toast({
-        title: "Error",
-        description: err?.data?.message || "Something went wrong",
-      });
+      toast({ title: "Error", description: err?.data?.message || "Something went wrong", variant: "destructive" });
     }
   };
 
@@ -113,173 +83,102 @@ export default function ManageScreens() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-5 animate-in fade-in duration-200 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-semibold">
-          {id ? "Edit Screen" : "Add Screen"}
-        </h1>
-        <p className="text-sm text-gray-500">
-          Screens / {id ? "Edit Screen" : "Add Screen"}
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">{id ? "Edit Screen" : "Add Screen"}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Screens › {id ? "Edit Screen" : "Add Screen"}</p>
       </div>
 
-      <div className="bg-gray-100 rounded-xl p-6">
-        <div className="grid grid-cols-2 gap-6 max-w-2xl">
-          <div className="col-span-2">
+      <div className="bg-card rounded-xl border border-border/60 shadow-[0_1px_3px_0_rgb(0,0,0,0.02)] p-5">
+        <div className="grid grid-cols-2 gap-5">
+          <div className="col-span-2 space-y-1.5">
             <Label>Screen Name *</Label>
-            <Input
-              value={form.screenName}
-              onChange={(e) => setForm({ ...form, screenName: e.target.value })}
-              placeholder="e.g. Terminal 1 Gate 5"
-            />
+            <Input value={form.screenName} onChange={(e) => setForm({ ...form, screenName: e.target.value })} placeholder="e.g. Terminal 1 Gate 5" className="h-9" />
           </div>
-
-          <div>
+          <div className="space-y-1.5">
             <Label>Location *</Label>
-            <Select
-              value={form.locationId}
-              onValueChange={(v) => setForm({ ...form, locationId: v })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select location" />
-              </SelectTrigger>
+            <Select value={form.locationId} onValueChange={(v) => setForm({ ...form, locationId: v })}>
+              <SelectTrigger className="h-9"><SelectValue placeholder="Select location" /></SelectTrigger>
               <SelectContent>
-                {locations.map((loc) => (
-                  <SelectItem key={loc.id} value={loc.id}>
-                    {loc.name}
-                  </SelectItem>
-                ))}
+                {locations.map((loc) => <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-
-          <div>
+          <div className="space-y-1.5">
             <Label>Orientation</Label>
-            <Select
-              value={form.orientation}
-              onValueChange={(v) =>
-                setForm({ ...form, orientation: v as "landscape" | "portrait" })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+            <Select value={form.orientation} onValueChange={(v) => setForm({ ...form, orientation: v as "landscape" | "portrait" })}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="landscape">Landscape</SelectItem>
                 <SelectItem value="portrait">Portrait</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
-          <div>
+          <div className="space-y-1.5">
             <Label>Resolution</Label>
-            <Input
-              value={form.resolution}
-              onChange={(e) => setForm({ ...form, resolution: e.target.value })}
-              placeholder="e.g. 1920x1080"
-            />
+            <Input value={form.resolution} onChange={(e) => setForm({ ...form, resolution: e.target.value })} placeholder="e.g. 1920x1080" className="h-9" />
           </div>
         </div>
       </div>
 
-      {/* Existing screen info */}
       {id && screenData && (
-        <div className="bg-gray-100 rounded-xl p-6">
-          <h2 className="font-semibold mb-3">Screen Details</h2>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="bg-card rounded-xl border border-border/60 p-5">
+          <h2 className="text-sm font-medium mb-3">Screen Details</h2>
+          <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-gray-500">Screen Code:</span>{" "}
-              <span className="font-mono">{screenData.screenCode}</span>
+              <span className="text-muted-foreground text-xs">Screen Code</span>
+              <p className="font-mono text-xs mt-0.5">{screenData.screenCode}</p>
             </div>
             <div>
-              <span className="text-gray-500">Device Token:</span>{" "}
-              <span className="font-mono text-xs">{screenData.deviceToken}</span>
+              <span className="text-muted-foreground text-xs">Status</span>
+              <p className="mt-0.5 capitalize">{screenData.status}</p>
             </div>
             <div>
-              <span className="text-gray-500">Status:</span> {screenData.status}
-            </div>
-            <div>
-              <span className="text-gray-500">Last Heartbeat:</span>{" "}
-              {screenData.lastHeartbeat
-                ? new Date(screenData.lastHeartbeat).toLocaleString()
-                : "Never"}
+              <span className="text-muted-foreground text-xs">Last Heartbeat</span>
+              <p className="mt-0.5">{screenData.lastHeartbeat ? new Date(screenData.lastHeartbeat).toLocaleString() : "Never"}</p>
             </div>
           </div>
         </div>
       )}
 
       <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={() => navigate("/screens")}>
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={creating || updating}
-          className="bg-purple-900 hover:bg-purple-800"
-        >
-          {creating || updating ? "Saving..." : "Save"}
+        <Button variant="outline" onClick={() => navigate("/screens")} className="h-9">Cancel</Button>
+        <Button onClick={handleSubmit} disabled={creating || updating} className="h-9 bg-primary hover:bg-primary/90">
+          {creating || updating ? "Saving..." : "Save Screen"}
         </Button>
       </div>
 
       {/* Created Secret Dialog */}
-      <Dialog
-        open={!!createdSecret}
-        onOpenChange={(open) => {
-          if (!open) {
-            setCreatedSecret(null);
-            navigate("/screens");
-          }
-        }}
-      >
-        <DialogContent className="max-w-lg">
+      <Dialog open={!!createdSecret} onOpenChange={(open) => { if (!open) { setCreatedSecret(null); navigate("/screens"); } }}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Screen Created Successfully</DialogTitle>
-            <DialogDescription>
-              <div className="flex items-center gap-2 mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <AlertTriangle size={18} className="text-yellow-600 flex-shrink-0" />
-                <span className="text-yellow-700 text-sm">
-                  Save the device secret now. It cannot be retrieved later.
-                </span>
+            <DialogTitle>Screen Created</DialogTitle>
+            <DialogDescription asChild>
+              <div className="flex items-start gap-2 mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <span className="text-amber-700 text-sm">Save the device secret now. It cannot be retrieved later.</span>
               </div>
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 mt-4">
-            {createdSecret &&
-              [
-                { label: "Screen Code", value: createdSecret.screenCode, field: "code" },
-                { label: "Device Token", value: createdSecret.deviceToken, field: "token" },
-                { label: "Device Secret", value: createdSecret.rawDeviceSecret, field: "secret" },
-              ].map(({ label, value, field }) => (
-                <div key={field}>
-                  <Label className="text-xs text-gray-500">{label}</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="flex-1 text-xs bg-gray-100 p-2 rounded break-all">
-                      {value}
-                    </code>
-                    <button
-                      onClick={() => copyValue(value, field)}
-                      className="p-2 hover:bg-gray-100 rounded"
-                    >
-                      {copiedField === field ? (
-                        <Check size={16} className="text-green-600" />
-                      ) : (
-                        <Copy size={16} />
-                      )}
-                    </button>
-                  </div>
+          <div className="space-y-3 mt-2">
+            {createdSecret && [
+              { label: "Screen Code", value: createdSecret.screenCode, field: "code" },
+              { label: "Device Token", value: createdSecret.deviceToken, field: "token" },
+              { label: "Device Secret", value: createdSecret.rawDeviceSecret, field: "secret" },
+            ].map(({ label, value, field }) => (
+              <div key={field}>
+                <Label className="text-xs text-muted-foreground">{label}</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <code className="flex-1 text-xs bg-muted p-2 rounded-lg break-all font-mono">{value}</code>
+                  <button onClick={() => copyValue(value, field)} className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
+                    {copiedField === field ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
-          <div className="flex justify-end mt-4">
-            <Button
-              onClick={() => {
-                setCreatedSecret(null);
-                navigate("/screens");
-              }}
-              className="bg-purple-900 hover:bg-purple-800"
-            >
-              Done
-            </Button>
+          <div className="flex justify-end mt-2">
+            <Button onClick={() => { setCreatedSecret(null); navigate("/screens"); }} className="bg-primary hover:bg-primary/90">Done</Button>
           </div>
         </DialogContent>
       </Dialog>

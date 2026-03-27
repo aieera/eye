@@ -24,7 +24,7 @@ export default function PublishDialog({ open, onOpenChange, onPublish, playlistN
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={onPublish} className="bg-purple-900 hover:bg-purple-800">Publish Now</Button>
+          <Button onClick={onPublish} className="bg-primary hover:bg-primary/90">Publish Now</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

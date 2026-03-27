@@ -82,18 +82,18 @@ export default function AddItemDialog({ open, onOpenChange, onAdd, defaultDurati
                 <button
                   key={p.id}
                   onClick={() => setSelectedProductId(p.id)}
-                  className={`w-full flex items-center gap-3 p-2 rounded-lg text-left hover:bg-gray-50 ${selectedProductId === p.id ? "bg-purple-50 border border-purple-200" : ""}`}
+                  className={`w-full flex items-center gap-3 p-2 rounded-lg text-left transition-colors ${selectedProductId === p.id ? "bg-primary/[0.08] border border-primary/20" : "hover:bg-muted/50"}`}
                 >
-                  <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                  <div className="w-10 h-10 bg-muted rounded-lg overflow-hidden flex-shrink-0">
                     {p.imageUrl ? <img src={p.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full" />}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{p.name}</p>
-                    <p className="text-xs text-gray-400">{p.externalItemCode} • {p.category?.name || "No category"}</p>
+                    <p className="text-xs text-muted-foreground">{p.externalItemCode} • {p.category?.name || "No category"}</p>
                   </div>
                 </button>
               ))}
-              {products.length === 0 && <p className="text-sm text-gray-400 text-center py-4">No products found</p>}
+              {products.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No products found</p>}
             </div>
           </TabsContent>
 
@@ -103,18 +103,18 @@ export default function AddItemDialog({ open, onOpenChange, onAdd, defaultDurati
                 <button
                   key={o.id}
                   onClick={() => setSelectedOfferId(o.id)}
-                  className={`w-full flex items-center gap-3 p-2 rounded-lg text-left hover:bg-gray-50 ${selectedOfferId === o.id ? "bg-purple-50 border border-purple-200" : ""}`}
+                  className={`w-full flex items-center gap-3 p-2 rounded-lg text-left transition-colors ${selectedOfferId === o.id ? "bg-primary/[0.08] border border-primary/20" : "hover:bg-muted/50"}`}
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium">{o.name}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-muted-foreground">
                       {o.offerPrice != null && `AED ${Number(o.offerPrice).toFixed(0)}`}
                       {o.discountPercentage != null && ` (${Number(o.discountPercentage).toFixed(0)}% off)`}
                     </p>
                   </div>
                 </button>
               ))}
-              {offers.length === 0 && <p className="text-sm text-gray-400 text-center py-4">No active offers</p>}
+              {offers.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No active offers</p>}
             </div>
           </TabsContent>
 
@@ -152,7 +152,7 @@ export default function AddItemDialog({ open, onOpenChange, onAdd, defaultDurati
           <TabsContent value="media" className="space-y-3 mt-4">
             <Input placeholder="https://..." value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} />
             {mediaUrl && (
-              <div className="aspect-[16/10] rounded-lg overflow-hidden bg-gray-100">
+              <div className="aspect-[16/10] rounded-lg overflow-hidden bg-muted/40">
                 <img src={mediaUrl} alt="Preview" className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               </div>
             )}
@@ -166,7 +166,7 @@ export default function AddItemDialog({ open, onOpenChange, onAdd, defaultDurati
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleAdd} className="bg-purple-900 hover:bg-purple-800">Add to Playlist</Button>
+          <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90">Add to Playlist</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

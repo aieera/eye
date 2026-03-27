@@ -203,10 +203,10 @@ export default function ScheduleForm({ open, onOpenChange, editSchedule, default
                   <button
                     key={i}
                     onClick={() => toggleDay(i)}
-                    className={`w-9 h-9 rounded-full text-xs font-medium border ${
+                    className={`w-9 h-9 rounded-full text-xs font-medium border transition-colors ${
                       form.daysOfWeek.includes(i)
-                        ? "bg-purple-900 text-white border-purple-900"
-                        : "bg-white text-gray-600 border-gray-300"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-muted-foreground border-border hover:border-primary/40"
                     }`}
                   >
                     {name}
@@ -239,7 +239,7 @@ export default function ScheduleForm({ open, onOpenChange, editSchedule, default
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSave} className="bg-purple-900 hover:bg-purple-800">
+          <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
             {editSchedule ? "Update" : "Create"}
           </Button>
         </DialogFooter>

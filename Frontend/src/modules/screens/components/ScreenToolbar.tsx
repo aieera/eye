@@ -1,5 +1,5 @@
-import { Search, Grid, List, Filter } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, Grid, List, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import {
   Select,
@@ -22,66 +22,33 @@ interface Props {
 }
 
 export default function ScreenToolbar({
-  view,
-  setView,
-  search,
-  onSearchChange,
-  statusFilter,
-  onStatusChange,
-  locationFilter,
-  onLocationChange,
+  view, setView, search, onSearchChange,
+  statusFilter, onStatusChange, locationFilter, onLocationChange,
 }: Props) {
   const navigate = useNavigate();
   const { data: locationsRes } = useGetLocationsQuery({ limit: 100 });
   const locations = locationsRes?.data ?? [];
 
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex items-center gap-4">
-        {/* Grid/List Toggle */}
-        <div className="flex items-center bg-white rounded-xl border shadow p-1">
-          <Button
-            size="icon"
-            onClick={() => setView("grid")}
-            className={`rounded-xl ${
-              view === "grid"
-                ? "bg-purple-900 hover:bg-purple-800 text-white"
-                : "bg-transparent text-black hover:bg-gray-100"
-            }`}
-          >
-            <Grid size={20} />
-          </Button>
-          <Button
-            size="icon"
-            onClick={() => setView("list")}
-            className={`rounded-xl ${
-              view === "list"
-                ? "bg-purple-900 hover:bg-purple-800 text-white"
-                : "bg-transparent text-black hover:bg-gray-100"
-            }`}
-          >
-            <List size={20} />
-          </Button>
-        </div>
-
+    <div className="flex items-center justify-between gap-3 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap">
         {/* Search */}
-        <div className="flex items-center bg-white px-5 py-3 rounded-xl shadow w-72">
-          <Search size={18} className="text-gray-400 mr-3" />
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
           <input
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search for Screens"
-            className="outline-none text-sm w-full bg-transparent"
+            placeholder="Search screens..."
+            className="h-9 rounded-lg border border-border bg-card pl-9 pr-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors w-64"
           />
         </div>
 
-        {/* Status Filter */}
+        {/* Status */}
         <Select
           value={statusFilter || "all"}
           onValueChange={(v) => onStatusChange(v === "all" ? undefined : v)}
         >
-          <SelectTrigger className="w-36 bg-white rounded-xl shadow border">
-            <Filter size={16} className="mr-2" />
+          <SelectTrigger className="w-36 h-9 text-sm bg-card">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -92,31 +59,51 @@ export default function ScreenToolbar({
           </SelectContent>
         </Select>
 
-        {/* Location Filter */}
+        {/* Location */}
         <Select
           value={locationFilter || "all"}
           onValueChange={(v) => onLocationChange(v === "all" ? undefined : v)}
         >
-          <SelectTrigger className="w-48 bg-white rounded-xl shadow border">
+          <SelectTrigger className="w-48 h-9 text-sm bg-card">
             <SelectValue placeholder="All Locations" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Locations</SelectItem>
             {locations.map((loc) => (
-              <SelectItem key={loc.id} value={loc.id}>
-                {loc.name}
-              </SelectItem>
+              <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
+
+        {/* View toggle */}
+        <div className="flex items-center bg-card rounded-lg border border-border p-1 gap-0.5">
+          <button
+            onClick={() => setView("list")}
+            className={cn(
+              "w-7 h-7 rounded-md flex items-center justify-center transition-colors",
+              view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setView("grid")}
+            className={cn(
+              "w-7 h-7 rounded-md flex items-center justify-center transition-colors",
+              view === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Grid className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
-      {/* Add Screens */}
+      {/* Add button */}
       <button
         onClick={() => navigate("/screens/new")}
-        className="bg-purple-900 text-white px-5 py-3 rounded-xl shadow hover:bg-purple-800"
+        className="h-9 rounded-lg bg-primary text-primary-foreground text-sm font-medium px-4 shadow-sm hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center gap-2"
       >
-        + Add Screen
+        <Plus className="w-4 h-4" /> Add Screen
       </button>
     </div>
   );

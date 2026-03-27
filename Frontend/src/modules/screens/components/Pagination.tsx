@@ -10,7 +10,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Props) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-6">
+    <div className="flex items-center justify-center gap-1.5 mt-6">
       <Button
         variant="outline"
         size="sm"
@@ -38,7 +38,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Props) {
             variant={page === pageNum ? "default" : "outline"}
             size="sm"
             onClick={() => onPageChange(pageNum)}
-            className={page === pageNum ? "bg-purple-900 hover:bg-purple-800" : ""}
+            className={page === pageNum ? "bg-primary hover:bg-primary/90 text-primary-foreground" : ""}
           >
             {pageNum}
           </Button>

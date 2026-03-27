@@ -14,16 +14,12 @@ export default function ScreensPage() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
   const [locationFilter, setLocationFilter] = useState<string | undefined>();
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Reset page on filter change
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, statusFilter, locationFilter]);
+  useEffect(() => { setPage(1); }, [debouncedSearch, statusFilter, locationFilter]);
 
   const { data: screensRes, isLoading } = useGetScreensQuery({
     page,
@@ -40,30 +36,22 @@ export default function ScreensPage() {
   const stats = statsRes?.data;
 
   return (
-    <div className="p-1 space-y-6">
+    <div className="p-6 space-y-5 animate-in fade-in duration-200">
       <div>
-        <h1 className="text-3xl font-semibold">Screens</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your display screens</p>
+        <h1 className="text-2xl font-semibold tracking-tight">Screens</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Manage your display screens</p>
       </div>
 
       <ScreenStats stats={stats} isLoading={statsLoading} />
 
       <ScreenToolbar
-        view={view}
-        setView={setView}
-        search={search}
-        onSearchChange={setSearch}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        locationFilter={locationFilter}
-        onLocationChange={setLocationFilter}
+        view={view} setView={setView}
+        search={search} onSearchChange={setSearch}
+        statusFilter={statusFilter} onStatusChange={setStatusFilter}
+        locationFilter={locationFilter} onLocationChange={setLocationFilter}
       />
 
-      {isLoading ? (
-        <div className="bg-white rounded-xl border p-12 text-center">
-          <p className="text-gray-500">Loading screens...</p>
-        </div>
-      ) : view === "list" ? (
+      {view === "list" ? (
         <ScreenTable screens={screens} />
       ) : (
         <ScreenGrid screens={screens} />

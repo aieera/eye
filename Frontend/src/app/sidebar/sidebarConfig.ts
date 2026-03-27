@@ -5,10 +5,10 @@ import {
   FolderTree,
   Percent,
   ListVideo,
-  CalendarClock,
-  Database,
+  CalendarDays,
+  RefreshCw,
   ScrollText,
-  Settings,
+  Settings2,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -24,23 +24,28 @@ export interface SidebarGroup {
 
 export const sidebarMenu: SidebarGroup[] = [
   {
-    label: "MENU",
+    label: "MAIN",
     items: [
       { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
       { name: "Screens", icon: Monitor, path: "/screens" },
       { name: "Products", icon: Package, path: "/products" },
       { name: "Categories", icon: FolderTree, path: "/categories" },
       { name: "Offers", icon: Percent, path: "/offers" },
+    ],
+  },
+  {
+    label: "CONTENT",
+    items: [
       { name: "Playlists", icon: ListVideo, path: "/playlists" },
-      { name: "Schedules", icon: CalendarClock, path: "/schedules" },
+      { name: "Schedules", icon: CalendarDays, path: "/schedules" },
     ],
   },
   {
     label: "SYSTEM",
     items: [
-      { name: "Data Sync", icon: Database, path: "/ingestion" },
+      { name: "Data Sync", icon: RefreshCw, path: "/ingestion" },
       { name: "Logs", icon: ScrollText, path: "/logs" },
-      { name: "Settings", icon: Settings, path: "/settings" },
+      { name: "Settings", icon: Settings2, path: "/settings" },
     ],
   },
 ];

@@ -142,13 +142,13 @@ export default function OfferDetail() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6 animate-in fade-in duration-200">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="text-2xl font-semibold tracking-tight">
             {id ? "Edit Offer" : "Create Offer"}
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Offers / {id ? form.name || "Edit" : "New Offer"}
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function OfferDetail() {
         )}
       </div>
 
-      <div className="bg-gray-100 rounded-xl p-6 space-y-6">
+      <div className="bg-card rounded-xl border border-border/60 p-5 space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Name *</Label>
@@ -313,7 +313,7 @@ export default function OfferDetail() {
         </div>
 
         {id && offer && (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             Source: <span className="font-medium capitalize">{offer.source}</span>
           </div>
         )}
@@ -326,7 +326,7 @@ export default function OfferDetail() {
         <Button
           onClick={handleSubmit}
           disabled={creating || updating}
-          className="bg-purple-900 hover:bg-purple-800"
+          className="bg-primary hover:bg-primary/90"
         >
           {creating || updating ? "Saving..." : "Save"}
         </Button>

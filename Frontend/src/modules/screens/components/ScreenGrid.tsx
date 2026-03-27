@@ -12,22 +12,22 @@ export default function ScreenGrid({ screens }: Props) {
 
   if (screens.length === 0) {
     return (
-      <div className="bg-white rounded-xl border p-12 text-center">
-        <p className="text-gray-500">No screens found</p>
-        <p className="text-sm text-gray-400 mt-1">Create your first screen to get started</p>
+      <div className="rounded-xl border border-border/60 bg-card p-12 text-center">
+        <p className="text-sm text-muted-foreground">No screens found</p>
+        <p className="text-sm text-muted-foreground/60 mt-1">Create your first screen to get started</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-3 gap-6">
+    <div className="grid grid-cols-3 gap-5">
       {screens.map((screen) => (
         <div
           key={screen.id}
-          className="bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition"
+          className="bg-card rounded-xl border border-border/60 overflow-hidden hover:shadow-md transition-shadow"
         >
           <div className="relative">
-            <div className="w-full h-40 bg-gray-100 flex items-center justify-center">
+            <div className="w-full h-40 bg-muted/40 flex items-center justify-center">
               {screen.image ? (
                 <img
                   src={screen.image}
@@ -35,7 +35,7 @@ export default function ScreenGrid({ screens }: Props) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-gray-400 text-sm">No image</span>
+                <span className="text-muted-foreground text-sm">No image</span>
               )}
             </div>
             <div className="absolute top-3 left-3">
@@ -43,14 +43,14 @@ export default function ScreenGrid({ screens }: Props) {
             </div>
             <button
               onClick={() => navigate(`/screens/${screen.id}`)}
-              className="absolute top-3 right-3 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+              className="absolute top-3 right-3 bg-card/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm hover:bg-card border border-border/60 transition-colors"
             >
               <Eye size={16} />
             </button>
           </div>
           <div className="p-4">
-            <p className="font-semibold text-sm">{screen.screenName}</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="font-medium text-sm">{screen.screenName}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {screen.location?.name ?? "No location"}
             </p>
           </div>
